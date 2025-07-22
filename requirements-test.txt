@@ -1,0 +1,5 @@
+pytest==7.4.0
+pyinstrument==4.5.1
+memray==1.9.1
+rich==13.5.2
+aiounittest==1.4.2

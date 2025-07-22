@@ -1,0 +1,58 @@
+image:
+  name: intechww-docker-local.jfrog.io/py-helm-cz:3.8.17
+  username: $JFROG_USERNAME
+  password: $JFROG_PASSWORD
+
+options:
+  size: 2x
+
+definitions:
+  services:
+    docker:
+      memory: 4096
+
+  scripts:
+    - script: &branch-check |
+        if ! [[ $BITBUCKET_BRANCH =~ "^(release//*|hotfix//*|master|develop)" ]]; then echo "Pipeline cannot be triggered on $BITBUCKET_BRANCH" && exit 1; fi
+
+    - script: &bump-script |
+        if [[ $BITBUCKET_BRANCH =~ "^(release//*|hotfix//*)" ]]; then
+          BRANCH_VERSION=$(echo $BITBUCKET_BRANCH | cut -d'/' -f2)
+          LOCAL_VERSION=$(cz version --project | cut -d'-' -f1)
+          if [ "$BRANCH_VERSION" != "$LOCAL_VERSION" ]; then
+            cz bump --yes "$BRANCH_VERSION-rc0"
+          else
+            cz bump -pr rc --yes
+          fi
+          NEW_VERSION=$(cz version --project)
+        elif [ "$BITBUCKET_BRANCH" = "master" ]; then
+          cz bump --yes
+          NEW_VERSION=$(cz version --project)
+        else
+          NEW_VERSION="dev-$BITBUCKET_BUILD_NUMBER"
+        fi
+
+  steps:
+    - step: &build-image
+        name: Build Image
+        deployment: test # HACK: Limit only one pipeline to run at a time
+        script:
+          - *branch-check
+          - git pull # HACK: Ensure we have the latest changes
+          - *bump-script
+          - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" "$DOCKER_REGISTRY"
+          - DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-1}
+          - docker build -t "$DOCKER_REGISTRY/$DOCKER_REPOSITORY:$NEW_VERSION" .
+          - docker push --all-tags "$DOCKER_REGISTRY/$DOCKER_REPOSITORY"
+          - git push --all
+          - git push --tags
+        services:
+          - docker
+
+pipelines:
+  branches:
+    master:
+      - step: *build-image
+  custom:
+    build-artifacts:
+      - step: *build-image

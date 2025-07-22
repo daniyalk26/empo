@@ -1,0 +1,71 @@
+CONFIG:
+  D2LAYOUT: dd/d2/layout/CASCADE_RCNN_R_50_FPN_GN.yaml
+  D2CELL: dd/d2/cell/CASCADE_RCNN_R_50_FPN_GN.yaml
+  D2ITEM: dd/d2/item/CASCADE_RCNN_R_50_FPN_GN.yaml
+WEIGHTS:
+  D2LAYOUT: layout/d2_model_0829999_layout_inf_only.pt
+  D2CELL: cell/d2_model_1849999_cell_inf_only.pt
+  D2ITEM: item/d2_model_1639999_item_inf_only.pt
+  DOCTR_RECOGNITION: doctr/crnn_vgg16_bn/pt/crnn_vgg16_bn-9762b0b0.pt
+  DOCTR_WORD: doctr/db_resnet50/pt/db_resnet50-ac60cadc.pt
+LAYOUT_NMS_PAIRS:
+  COMBINATIONS:
+    - - text
+      - table
+    - - title
+      - table
+    - - text
+      - list
+    - - title
+      - list
+    - - text
+      - title
+    - - list
+      - table
+  THRESHOLDS:
+    - 0.005
+    - 0.005
+    - 0.542
+    - 0.1
+    - 0.699
+    - 0.01
+SEGMENTATION:
+  ASSIGNMENT_RULE: ioa
+  THRESHOLD_ROWS: 0.9
+  THRESHOLD_COLS: 0.9
+  FULL_TABLE_TILING: True
+  REMOVE_IOU_THRESHOLD_ROWS: 0.5
+  REMOVE_IOU_THRESHOLD_COLS: 0.5
+  STRETCH_RULE: equal
+  USE_REFINEMENT: False
+WORD_MATCHING:
+  PARENTAL_CATEGORIES:
+    - text
+    - title
+    - list
+    - table
+    - cell
+    - figure
+  CHILD_CATEGORIES:
+    - word
+  RULE: ioa
+  THRESHOLD: 0.4
+  MAX_PARENT_ONLY: False
+TEXT_ORDERING:
+  TEXT_CONTAINER: word
+  FLOATING_TEXT_BLOCK:
+    - title
+    - text
+    - list
+    - table
+    - figure
+  TEXT_BLOCK:
+    - title
+    - text
+    - list
+    - table
+    - cell
+    - figure
+  TEXT_CONTAINER_TO_TEXT_BLOCK: True
+DEVICE: cpu
+USE_DOCTR: True

@@ -1,0 +1,28 @@
+# Virtual Environment
+**/venv
+**/.venv
+
+# IDE
+**/.vscode
+
+# Version Control
+**/.git
+**/.gitignore
+**/.gitmodules
+
+# Docker
+**/Dockerfile
+**/.dockerignore
+
+# CI/CD
+**/bitbucket-pipelines.yml
+
+# Test
+test/
+test_doc/
+
+# Misc
+**/README.md
+**/.DS_Store
+**/*.pdf
+queue_listener.py
